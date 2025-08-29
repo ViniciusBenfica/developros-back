@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  url-shortener-backend:
+    container_name: url-shortener-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@url-shortener-db:5432/${POSTGRES_DB}
+    env_file:
+      - .env
+    depends_on:
+      - url-shortener-db
+
+  url-shortener-db:
+    container_name: url-shortener-db
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - 5432:5432
+    env_file:
+      - .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./prisma/migrations:/docker-entrypoint-initdb.d
+
+
+volumes:
+  pgdata:

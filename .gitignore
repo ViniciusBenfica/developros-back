@@ -1,0 +1,5 @@
+node_modules
+.env
+prisma/generated
+pnpm-lock.yaml
+/dist
